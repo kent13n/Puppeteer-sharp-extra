@@ -47,12 +47,12 @@ namespace Extra.Tests.Recaptcha.AntiCaptcha
             var button = await page.QuerySelectorAsync("input[type='submit']");
             await button.ClickAsync();
 
-            await page.WaitForTimeoutAsync(1000);
+            await Task.Delay(1000);
             await CheckSuccessVerify(page);
         }
 
         [Fact]
-        public async void ShouldSolveCaptchaWithCallback()
+        public async Task ShouldSolveCaptchaWithCallback()
         {
             var plugin = new RecaptchaPlugin(new PuppeteerExtraSharp.Plugins.Recaptcha.Provider.AntiCaptcha.AntiCaptcha(Resources.AntiCaptchaKey));
             var browser = await LaunchWithPluginAsync(plugin);
@@ -62,7 +62,7 @@ namespace Extra.Tests.Recaptcha.AntiCaptcha
 
             Assert.Null(result.Exception);
 
-            await page.WaitForTimeoutAsync(1000);
+            await Task.Delay(1000);
             await CheckSuccessVerify(page);
         }
 

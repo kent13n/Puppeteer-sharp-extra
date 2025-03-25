@@ -10,7 +10,7 @@ namespace PuppeteerExtraSharp
 {
     public class PuppeteerExtra
     {
-        private List<PuppeteerExtraPlugin> _plugins = new List<PuppeteerExtraPlugin>();
+        private List<PuppeteerExtraPlugin> _plugins = [];
 
         public PuppeteerExtra Use(PuppeteerExtraPlugin plugin)
         {
@@ -47,7 +47,7 @@ namespace PuppeteerExtraSharp
 
         public T GetPlugin<T>() where T : PuppeteerExtraPlugin
         {
-            return (T) _plugins.FirstOrDefault(e => e.GetType() == typeof(T));
+            return (T)_plugins.FirstOrDefault(e => e.GetType() == typeof(T));
         }
 
         private async Task OnStart(BrowserStartContext context, IBrowser browser)

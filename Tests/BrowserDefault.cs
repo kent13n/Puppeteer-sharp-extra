@@ -61,7 +61,7 @@ namespace Extra.Tests
             await new BrowserFetcher(new BrowserFetcherOptions()
             {
                 Path = Constants.PathToChrome
-            }).DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+            }).DownloadAsync(BrowserTag.Latest);
         }
 
         protected LaunchOptions CreateDefaultOptions()
