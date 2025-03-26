@@ -42,6 +42,12 @@
                     return 'probably'
                 }
             }
+            // Chrome will deprecate and remove support for the Theora video codec in desktop Chrome due to emerging security risks
+            if (mime === 'video/ogg') {
+                if (codecs.includes('theora')) {
+                    return ''
+                }
+            }
             // This mimetype is only supported if no codecs are specified
             if (mime === 'audio/x-m4a' && !codecs.length) {
                 return 'maybe'
