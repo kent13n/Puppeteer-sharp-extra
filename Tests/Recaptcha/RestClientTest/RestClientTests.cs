@@ -15,13 +15,20 @@ namespace Extra.Tests.Recaptcha.RestClientTest
         public async Task ShouldWorkPostWithJson()
         {
             var client = new RestClient("https://postman-echo.com");
-            var data = ("test", "123");
-            
-            var result = await client.PostWithJsonAsync<Dictionary<string,string>>("post", data, new CancellationToken());
+            var data = new Dictionary<string, string>
+            {
+                {
+                    "test", "123"
+                },
+            };
 
-            var actual = JsonConvert.DeserializeObject<(string, string)>(result.First(e => e.Key == "json").Value);
+            var result = await client.PostWithJsonAsync<Dictionary<string, object>>("/post", data, CancellationToken.None);
 
-            Assert.Equal(data, actual);
+            Assert.NotNull(result);
+            Assert.True(result.ContainsKey("json"));
+
+            var jsonData = JsonConvert.DeserializeObject<Dictionary<string, string>>(result["json"].ToString());
+            Assert.Equal(data, jsonData);
         }
 
     }
