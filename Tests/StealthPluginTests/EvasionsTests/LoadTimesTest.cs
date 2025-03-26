@@ -15,10 +15,9 @@ namespace Extra.Tests.StealthPluginTests.EvasionsTests
 
             await page.GoToAsync("https://google.com");
 
-            var loadTimes = await page.EvaluateFunctionAsync<JObject>("() => window.chrome.loadTimes()");
-
-            Assert.NotNull(loadTimes);
-
+            var loadTimesJsonElement = await page.EvaluateFunctionAsync("() => window.chrome.loadTimes()");
+            Assert.NotNull(loadTimesJsonElement);
+            var loadTimes = JObject.Parse(loadTimesJsonElement.Value.GetRawText());
             Assert.NotNull(loadTimes["connectionInfo"]);
             Assert.NotNull(loadTimes["npnNegotiatedProtocol"]);
             Assert.NotNull(loadTimes["wasAlternateProtocolAvailable"]);

@@ -18,9 +18,8 @@ namespace Extra.Tests.StealthPluginTests.EvasionsTests
             
           
             var fingerPrint = await new FingerPrint().GetFingerPrint(page);
-
-            Assert.Equal(3, fingerPrint["plugins"].Count());
-            Assert.Equal(4, fingerPrint["mimeTypes"].Count());
+            Assert.Equal(5, fingerPrint["plugins"].Count());
+            Assert.Equal(2, fingerPrint["mimeTypes"].Count());
         }
     }
 }

@@ -16,10 +16,10 @@ namespace Extra.Tests.StealthPluginTests.EvasionsTests
 
             await page.GoToAsync("https://google.com");
 
-            var runtime = await page.EvaluateExpressionAsync<JObject>("chrome.runtime");
+            var runtime = await page.EvaluateExpressionAsync("chrome.runtime");
             Assert.NotNull(runtime);
 
-            var runtimeConnect = await page.EvaluateExpressionAsync<JObject>("chrome.runtime.connect");
+            var runtimeConnect = await page.EvaluateExpressionAsync("chrome.runtime.connect");
             Assert.NotNull(runtimeConnect);
 
             var runtimeName = await page.EvaluateExpressionAsync<string>("chrome.runtime.connect.name");

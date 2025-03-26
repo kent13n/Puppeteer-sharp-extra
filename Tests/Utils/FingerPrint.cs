@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using PuppeteerExtraSharp.Utils;
@@ -18,10 +19,10 @@ namespace Extra.Tests.Utils
             var script = ResourcesReader.ReadFile("Extra.Tests.StealthPluginTests.Script.fpCollect.js", Assembly.GetExecutingAssembly());
             await page.EvaluateExpressionAsync(script);
 
-            var fingerPrint =
-                await page.EvaluateFunctionAsync<JObject>("async () => await fpCollect().generateFingerprint()");
+            var jsonElement =
+                await page.EvaluateFunctionAsync<JsonElement>("async () => await fpCollect().generateFingerprint()");
 
-            return fingerPrint;
+            return JObject.Parse(jsonElement.GetRawText());
         }
     }
 }
