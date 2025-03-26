@@ -36,7 +36,8 @@ namespace PuppeteerExtraSharp.Plugins.ExtraStealth
                 new StackTrace(),
                 new HardwareConcurrency(GetOptionByType<StealthHardwareConcurrencyOptions>()),
                 new ContentWindow(),
-                new SourceUrl()
+                new SourceUrl(),
+                new Viewport()
             ];
         }
 
