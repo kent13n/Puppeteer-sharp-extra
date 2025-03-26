@@ -113,6 +113,15 @@ namespace PuppeteerExtraSharp
                     _plugins.ForEach(async e => await e.OnPageCreated(page));
                 }
             };
+            
+            if (_plugins.Any())
+            {
+                foreach (var page in pages)
+                {
+                    var utilsScript = PuppeteerExtraSharp.Plugins.ExtraStealth.Utils.GetScript("Utils.js");
+                    await page.EvaluateExpressionOnNewDocumentAsync(utilsScript);
+                }
+            }
 
             foreach (var puppeteerExtraPlugin in _plugins)
             {

@@ -42,12 +42,6 @@ namespace PuppeteerExtraSharp.Plugins.ExtraStealth
 
         public override ICollection<PuppeteerExtraPlugin> GetDependencies() => _standardEvasions;
 
-        public override async Task OnPageCreated(IPage page)
-        {
-            var utilsScript = Utils.GetScript("Utils.js");
-            await page.EvaluateExpressionOnNewDocumentAsync(utilsScript);
-        }
-
         private T GetOptionByType<T>() where T : IPuppeteerExtraPluginOptions
         {
             return _options.OfType<T>().FirstOrDefault();
