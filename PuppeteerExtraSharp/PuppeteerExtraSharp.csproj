@@ -10,6 +10,9 @@
     <PackageProjectUrl>https://github.com/Overmiind/Puppeteer-sharp-extra</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <UserSecretsId>945328fb-3e7e-4518-99f8-ec578bf688b1</UserSecretsId>
+    <PackageId>Kent13n.PuppeteerExtraSharp</PackageId>
+    <Authors>Overmiind, Kent13n</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +33,7 @@
     <None Remove="Plugins\ExtraStealth\Scripts\WebDriver.js" />
     <None Remove="Plugins\ExtraStealth\Scripts\WebGL.js" />
     <None Remove="Plugins\Recaptcha\Scripts\EnterRecaptchaCallBackScript.js" />
+    <None Include="README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
