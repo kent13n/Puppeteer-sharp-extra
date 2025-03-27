@@ -12,18 +12,19 @@ namespace PuppeteerExtraSharp.Plugins.ExtraStealth.Evasions
 
         public override async Task OnPageCreated(IPage page)
         {
-            page.Load += async (_, _) =>
-            {
-                await page.EvaluateFunctionAsync(@"
-                    () => {
-                        Error.prepareStackTrace = (_, structuredStackTrace) => {
-                            return structuredStackTrace
-                                .map(callSite => callSite.toString().replace('puppeteer_evaluation_script', ''))
-                                .join('\n');
-                        };
-                    }
-                ");
-            };
+            await page.EvaluateFunctionOnNewDocumentAsync(@"
+                () => {
+                    const originalPrepareStackTrace = Error.prepareStackTrace;
+                    Error.prepareStackTrace = (err, structuredStackTrace) => {
+                        const stack = structuredStackTrace
+                            .map(callSite => callSite.toString().replace('puppeteer_evaluation_script', ''))
+                            .join('\n');
+                        return originalPrepareStackTrace
+                            ? originalPrepareStackTrace(err, structuredStackTrace)
+                            : stack;
+                    };
+                }
+            ");
         }
     }
 }
