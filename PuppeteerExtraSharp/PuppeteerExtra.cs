@@ -109,17 +109,42 @@ namespace PuppeteerExtraSharp
                 _plugins.ForEach(e => e.OnTargetCreated(args.Target));
                 if (args.Target.Type == TargetType.Page)
                 {
-                    var page = await args.Target.PageAsync();
-                    _plugins.ForEach(async e => await e.OnPageCreated(page));
+                    try
+                    {
+                        var page = await args.Target.PageAsync();
+
+                        foreach (var plugin in _plugins)
+                        {
+                            try
+                            {
+                                await plugin.OnPageCreated(page);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"[PuppeteerExtra] Plugin {plugin.Name} OnPageCreated error: {ex.Message}");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Erreur lors de la récupération de la page: {ex.Message}");
+                    }
                 }
             };
-            
+
             if (_plugins.Any())
             {
                 foreach (var page in pages)
                 {
-                    var utilsScript = PuppeteerExtraSharp.Plugins.ExtraStealth.Utils.GetScript("Utils.js");
-                    await page.EvaluateExpressionOnNewDocumentAsync(utilsScript);
+                    try
+                    {
+                        var utilsScript = PuppeteerExtraSharp.Plugins.ExtraStealth.Utils.GetScript("Utils.js");
+                        await page.EvaluateExpressionOnNewDocumentAsync(utilsScript);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[PuppeteerExtra] Erreur injection Utils.js sur page existante : {ex.Message}");
+                    }
                 }
             }
 
@@ -131,7 +156,14 @@ namespace PuppeteerExtraSharp
                 browser.Closed += (sender, args) => puppeteerExtraPlugin.OnClose();
                 foreach (var page in pages)
                 {
-                    await puppeteerExtraPlugin.OnPageCreated(page);
+                    try
+                    {
+                        await puppeteerExtraPlugin.OnPageCreated(page);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[PuppeteerExtra] Plugin {puppeteerExtraPlugin.Name} OnPageCreated (existing page) error: {ex.Message}");
+                    }
                 }
             }
         }
