@@ -6,6 +6,7 @@ using PuppeteerExtraSharp.Plugins.CaptchaSolver.Enums;
 using PuppeteerExtraSharp.Plugins.CaptchaSolver.Interfaces;
 using PuppeteerExtraSharp.Plugins.CaptchaSolver.Models;
 using PuppeteerExtraSharp.Plugins.CaptchaSolver.Vendors.Cloudflare;
+using PuppeteerExtraSharp.Plugins.CaptchaSolver.Vendors.DataDome;
 using PuppeteerExtraSharp.Plugins.CaptchaSolver.Vendors.GeeTest;
 using PuppeteerExtraSharp.Plugins.CaptchaSolver.Vendors.Google;
 using PuppeteerExtraSharp.Plugins.CaptchaSolver.Vendors.HCaptcha;
@@ -120,7 +121,8 @@ internal class CaptchaSolver : ICaptchaSolver
             new CloudflareVendor(provider, options),
             new HCaptchaVendor(provider, options),
             new GoogleVendor(provider, options),
-            new GeeTestVendor(provider, _optionsScope)
+            new GeeTestVendor(provider, _optionsScope),
+            new DataDomeVendor(provider, _optionsScope)
         ];
     }
 }
