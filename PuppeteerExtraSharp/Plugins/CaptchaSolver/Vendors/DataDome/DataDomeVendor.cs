@@ -143,9 +143,6 @@ public class DataDomeVendor(ICaptchaSolverProvider provider, CaptchaOptionsScope
     {
         await LoadScriptAsync(page);
 
-        // Get the current URL before entering solutions (in case we need to reload)
-        var currentUrl = page.Url;
-
         var result = await page.EvaluateFunctionAsync<DataDomeEnterSolutionsResult>(
             @"(solutions) => {return window.dataDomeScript.enterCaptchaSolutions(solutions)}",
             solutions);
@@ -155,39 +152,26 @@ public class DataDomeVendor(ICaptchaSolverProvider provider, CaptchaOptionsScope
             throw new NullReferenceException("EnterCaptchaSolutionsAsync failed, result is null");
         }
 
-        // DataDome requires a page reload after setting the cookie
+        // DO NOT reload here - let the caller handle it
+        // The NeedsReload flag will be exposed via EnterCaptchaSolutionsResult
+
         if (result.NeedsReload && result.Solved != null && result.Solved.Any(s => s.IsSolved == true))
         {
-            if (options.Current.Debug)
-            {
-                await page.EvaluateExpressionAsync(
-                    "console.log('[DataDome] Cookie set, reloading page...')");
-            }
-
-            // Small delay to ensure cookie is properly set
+            // Small delay to ensure the cookie is properly set before caller reloads
             await Task.Delay(500);
 
-            // Reload the page to apply the DataDome cookie
-            await page.ReloadAsync(new NavigationOptions
-            {
-                WaitUntil = [WaitUntilNavigation.DOMContentLoaded],
-                Timeout = 30000
-            });
-
-            // Wait for the page to stabilize
-            await Task.Delay(2000);
-
             if (options.Current.Debug)
             {
                 await page.EvaluateExpressionAsync(
-                    "console.log('[DataDome] Page reloaded after captcha solution')");
+                    "console.log('[DataDome] Cookie set, caller should reload the page')");
             }
         }
 
         return new EnterCaptchaSolutionsResult
         {
             Solved = result.Solved,
-            Error = result.Error
+            Error = result.Error,
+            NeedsReload = result.NeedsReload
         };
     }
 
