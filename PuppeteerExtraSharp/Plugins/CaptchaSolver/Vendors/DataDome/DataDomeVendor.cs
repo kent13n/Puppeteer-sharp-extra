@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using PuppeteerExtraSharp.Plugins.CaptchaSolver.Enums;
@@ -106,33 +107,58 @@ public class DataDomeVendor(ICaptchaSolverProvider provider, CaptchaOptionsScope
         var solutions = new List<CaptchaSolution>();
         foreach (var captcha in captchas)
         {
-            var payload = await provider.GetSolutionAsync(new GetCaptchaSolutionRequest
+            // Skip captchas without a valid captcha URL - these are likely block pages without a solvable captcha
+            if (string.IsNullOrEmpty(captcha.DataDomeCaptchaUrl))
             {
-                PageUrl = captcha.Url,
-                Vendor = CaptchaVendor.DataDome,
-                Version = CaptchaVersion.DataDome,
-                // DataDome-specific fields
-                DataDomeCaptchaUrl = captcha.DataDomeCaptchaUrl,
-                DataDomeCid = captcha.DataDomeCid,
-                DataDomeHash = captcha.DataDomeHash,
-                // Use browser's actual UserAgent, not the one from JS (they should match)
-                DataDomeUserAgent = browserUserAgent,
-                DataDomeReferer = captcha.DataDomeReferer ?? page.Url,
-                // Proxy settings (required for DataDome)
-                ProxyType = currentOptions.ProxyType ?? "http",
-                ProxyAddress = currentOptions.ProxyAddress,
-                ProxyPort = currentOptions.ProxyPort,
-                ProxyLogin = currentOptions.ProxyLogin,
-                ProxyPassword = currentOptions.ProxyPassword,
-                ProxySessionId = currentOptions.ProxySessionId,
-            });
+                if (currentOptions.Debug)
+                {
+                    await page.EvaluateExpressionAsync(
+                        "console.log('[DataDome] Skipping captcha - no captcha URL found (likely a block page)')");
+                }
+                continue;
+            }
 
-            solutions.Add(new CaptchaSolution
+            try
             {
-                Id = captcha.Id,
-                Vendor = CaptchaVendor.DataDome,
-                Payload = payload,
-            });
+                var payload = await provider.GetSolutionAsync(new GetCaptchaSolutionRequest
+                {
+                    PageUrl = captcha.Url,
+                    Vendor = CaptchaVendor.DataDome,
+                    Version = CaptchaVersion.DataDome,
+                    // DataDome-specific fields
+                    DataDomeCaptchaUrl = captcha.DataDomeCaptchaUrl,
+                    DataDomeCid = captcha.DataDomeCid,
+                    DataDomeHash = captcha.DataDomeHash,
+                    // Use browser's actual UserAgent, not the one from JS (they should match)
+                    DataDomeUserAgent = browserUserAgent,
+                    DataDomeReferer = captcha.DataDomeReferer ?? page.Url,
+                    // Proxy settings (required for DataDome)
+                    ProxyType = currentOptions.ProxyType ?? "http",
+                    ProxyAddress = currentOptions.ProxyAddress,
+                    ProxyPort = currentOptions.ProxyPort,
+                    ProxyLogin = currentOptions.ProxyLogin,
+                    ProxyPassword = currentOptions.ProxyPassword,
+                    ProxySessionId = currentOptions.ProxySessionId,
+                });
+
+                solutions.Add(new CaptchaSolution
+                {
+                    Id = captcha.Id,
+                    Vendor = CaptchaVendor.DataDome,
+                    Payload = payload,
+                });
+            }
+            catch (HttpRequestException ex) when (ex.Message.Contains("blocked captcha url") ||
+                                                   ex.Message.Contains("ERROR_INVALID_TASK_DATA"))
+            {
+                // This captcha URL is blocked or unsupported by the solver - skip it
+                if (currentOptions.Debug)
+                {
+                    await page.EvaluateExpressionAsync(
+                        $"console.log('[DataDome] Captcha URL blocked or unsupported by solver: {EscapeJs(ex.Message)}')");
+                }
+                continue;
+            }
         }
 
         return solutions;
