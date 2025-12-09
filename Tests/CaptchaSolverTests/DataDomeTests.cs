@@ -6,6 +6,7 @@ using PuppeteerExtraSharp.Plugins.CaptchaSolver;
 using PuppeteerExtraSharp.Plugins.CaptchaSolver.Enums;
 using PuppeteerExtraSharp.Plugins.CaptchaSolver.Interfaces;
 using PuppeteerExtraSharp.Plugins.CaptchaSolver.Models;
+using PuppeteerSharp;
 using Xunit;
 
 namespace Extra.Tests.CaptchaSolverTests;
@@ -96,6 +97,17 @@ public class DataDomeTests : CaptchaSolverTestsBase
                 var cookies = await page.GetCookiesAsync();
                 var dataDomeCookie = cookies.FirstOrDefault(c => c.Name == "datadome");
                 Assert.NotNull(dataDomeCookie);
+
+                if (result.NeedsReload)
+                {
+                    var responseTask = page.WaitForNavigationAsync(new NavigationOptions
+                    {
+                        WaitUntil = [WaitUntilNavigation.Networkidle2],
+                        Timeout = 120000
+                    });
+                    await page.ReloadAsync();
+                    await responseTask;
+                }
             }
             else
             {
