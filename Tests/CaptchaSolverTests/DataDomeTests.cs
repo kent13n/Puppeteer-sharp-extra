@@ -62,6 +62,7 @@ public class DataDomeTests : CaptchaSolverTestsBase
         try
         {
             var page = (await browser.PagesAsync())[0];
+            await page.SetUserAgentAsync("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36");
 
             if (!string.IsNullOrEmpty(proxyLoginWithSession) && !string.IsNullOrEmpty(Resources.ProxyPassword))
             {
