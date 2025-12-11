@@ -325,7 +325,13 @@
                         // Log the full payload for debugging
                         this.log('Full payload received', JSON.stringify(payload));
 
-                        const cookie = payload && (payload.cookie || payload.datadome || payload.Cookie);
+                        let cookie = payload && (payload.cookie || payload.datadome || payload.Cookie);
+
+                        // Normalize the cookie string - handle escaped forward slashes from JSON
+                        // (e.g., "Path=\/" becomes "Path=/")
+                        if (cookie) {
+                            cookie = cookie.replace(/\\\//g, '/');
+                        }
 
                         if (!cookie) {
                             this.log('Payload received (no cookie found)', payload);
